@@ -1,6 +1,6 @@
-# An example SPA in Elm
+# An orders SPA in Elm
 
-An example Elm single page application built for http://www.elm-tutorial.org/
+Based on tutorial http://www.elm-tutorial.org/
 
 ## Setup
 

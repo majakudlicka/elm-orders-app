@@ -1,16 +1,16 @@
 module Routing exposing (..)
 
 import Navigation exposing (Location)
-import Models exposing (PlayerId, Route(..))
+import Models exposing (OrderId, Route(..))
 import UrlParser exposing (..)
 
 
 matchers : Parser (Route -> a) a
 matchers =
     oneOf
-        [ map PlayersRoute top
-        , map PlayerRoute (s "players" </> string)
-        , map PlayersRoute (s "players")
+        [ map OrdersRoute top
+        , map OrderRoute (s "orders" </> string)
+        , map OrdersRoute (s "orders")
         ]
 
 
@@ -24,11 +24,11 @@ parseLocation location =
             NotFoundRoute
 
 
-playersPath : String
-playersPath =
-    "#players"
+ordersPath : String
+ordersPath =
+    "#orders"
 
 
-playerPath : PlayerId -> String
-playerPath id =
-    "#players/" ++ id
+orderPath : OrderId -> String
+orderPath id =
+    "#orders/" ++ id

@@ -5,70 +5,70 @@ import Json.Decode as Decode
 import Json.Decode.Pipeline exposing (decode, required)
 import Json.Encode as Encode
 import Msgs exposing (Msg)
-import Models exposing (PlayerId, Player)
+import Models exposing (OrderId, Order)
 import RemoteData
 
 
-fetchPlayers : Cmd Msg
-fetchPlayers =
-    Http.get fetchPlayersUrl playersDecoder
+fetchOrders : Cmd Msg
+fetchOrders =
+    Http.get fetchOrdersUrl ordersDecoder
         |> RemoteData.sendRequest
-        |> Cmd.map Msgs.OnFetchPlayers
+        |> Cmd.map Msgs.OnFetchOrders
 
 
-fetchPlayersUrl : String
-fetchPlayersUrl =
-    "http://localhost:4000/players"
+fetchOrdersUrl : String
+fetchOrdersUrl =
+    "http://localhost:4000/orders"
 
 
-savePlayerUrl : PlayerId -> String
-savePlayerUrl playerId =
-    "http://localhost:4000/players/" ++ playerId
+saveOrderUrl : OrderId -> String
+saveOrderUrl orderId =
+    "http://localhost:4000/orders/" ++ orderId
 
 
-savePlayerRequest : Player -> Http.Request Player
-savePlayerRequest player =
+saveOrderRequest : Models.Order -> Http.Request Models.Order
+saveOrderRequest order =
     Http.request
-        { body = playerEncoder player |> Http.jsonBody
-        , expect = Http.expectJson playerDecoder
+        { body = orderEncoder order |> Http.jsonBody
+        , expect = Http.expectJson orderDecoder
         , headers = []
         , method = "PATCH"
         , timeout = Nothing
-        , url = savePlayerUrl player.id
+        , url = saveOrderUrl order.id
         , withCredentials = False
         }
 
 
-savePlayerCmd : Player -> Cmd Msg
-savePlayerCmd player =
-    savePlayerRequest player
-        |> Http.send Msgs.OnPlayerSave
+saveOrderCmd : Models.Order -> Cmd Msg
+saveOrderCmd order =
+    saveOrderRequest order
+        |> Http.send Msgs.OnOrderSave
 
 
 
 -- DECODERS
 
 
-playersDecoder : Decode.Decoder (List Player)
-playersDecoder =
-    Decode.list playerDecoder
+ordersDecoder : Decode.Decoder (List Models.Order)
+ordersDecoder =
+    Decode.list orderDecoder
 
 
-playerDecoder : Decode.Decoder Player
-playerDecoder =
-    decode Player
+orderDecoder : Decode.Decoder Models.Order
+orderDecoder =
+    decode Order
         |> required "id" Decode.string
         |> required "name" Decode.string
-        |> required "level" Decode.int
+        |> required "quantity" Decode.int
 
 
-playerEncoder : Player -> Encode.Value
-playerEncoder player =
+orderEncoder : Models.Order -> Encode.Value
+orderEncoder order =
     let
         attributes =
-            [ ( "id", Encode.string player.id )
-            , ( "name", Encode.string player.name )
-            , ( "level", Encode.int player.level )
+            [ ( "id", Encode.string order.id )
+            , ( "name", Encode.string order.name )
+            , ( "quantity", Encode.int order.quantity )
             ]
     in
         Encode.object attributes

@@ -1,7 +1,7 @@
 module Update exposing (..)
 
-import Commands exposing (savePlayerCmd)
-import Models exposing (Model, Player)
+import Commands exposing (saveOrderCmd)
+import Models exposing (Model, Order)
 import Msgs exposing (Msg)
 import Routing exposing (parseLocation)
 import RemoteData
@@ -10,8 +10,8 @@ import RemoteData
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        Msgs.OnFetchPlayers response ->
-            ( { model | players = response }, Cmd.none )
+        Msgs.OnFetchOrders response ->
+            ( { model | orders = response }, Cmd.none )
 
         Msgs.OnLocationChange location ->
             let
@@ -20,33 +20,33 @@ update msg model =
             in
                 ( { model | route = newRoute }, Cmd.none )
 
-        Msgs.ChangeLevel player howMuch ->
+        Msgs.ChangeQuantity order howMuch ->
             let
-                updatedPlayer =
-                    { player | level = player.level + howMuch }
+                updatedOrder =
+                    { order | quantity = order.quantity + howMuch }
             in
-                ( model, savePlayerCmd updatedPlayer )
+                ( model, saveOrderCmd updatedOrder )
 
-        Msgs.OnPlayerSave (Ok player) ->
-            ( updatePlayer model player, Cmd.none )
+        Msgs.OnOrderSave (Ok order) ->
+            ( updateOrder model order, Cmd.none )
 
-        Msgs.OnPlayerSave (Err error) ->
+        Msgs.OnOrderSave (Err error) ->
             ( model, Cmd.none )
 
 
-updatePlayer : Model -> Player -> Model
-updatePlayer model updatedPlayer =
+updateOrder : Model -> Models.Order -> Model
+updateOrder model updatedOrder =
     let
-        pick currentPlayer =
-            if updatedPlayer.id == currentPlayer.id then
-                updatedPlayer
+        pick currentOrder =
+            if updatedOrder.id == currentOrder.id then
+                updatedOrder
             else
-                currentPlayer
+                currentOrder
 
-        updatePlayerList players =
-            List.map pick players
+        updateOrderList orders =
+            List.map pick orders
 
-        updatedPlayers =
-            RemoteData.map updatePlayerList model.players
+        updatedOrders =
+            RemoteData.map updateOrderList model.orders
     in
-        { model | players = updatedPlayers }
+        { model | orders = updatedOrders }
